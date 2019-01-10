@@ -1,0 +1,24 @@
+{
+    "name": "syncxplus/shadowbox2",
+    "authors": [
+        {
+            "name": "jibo",
+            "email": "jibo@outlook.com"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "bcosca/fatfree": "dev-3.6.5-syncxplus",
+        "ramsey/uuid": "^3.8"
+    },
+    "repositories": {
+        "0": {
+            "type": "vcs",
+            "url": "https://github.com/syncxplus/fatfree"
+        },
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    }
+}
