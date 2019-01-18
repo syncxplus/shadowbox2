@@ -7,9 +7,6 @@ use Ramsey\Uuid\Uuid;
 class Outline extends Base
 {
     private $logger;
-    private $sharedPort;
-    private $exclusivePort;
-    private $exclusiveRate;
     private $data;
 
     function manipulate(\Base $f3)
@@ -26,7 +23,7 @@ class Outline extends Base
                 $newUsers = ['keys' => []];
                 if (intval($count) > 0) {
                     $nextId = $this->getNextId();
-                    $nextPort = $this->getNextPort();
+                    $nextPort = $this->getNextPort($rate);
                     for ($i = 0 ; $i < $count; $i ++) {
                         $user = $this->createUser($nextId, $nextPort, $rate);
                         $this->data['keys'][] = $user;
@@ -65,9 +62,6 @@ class Outline extends Base
     {
         $f3 = \Base::instance();
         $this->logger = $f3->get('LOGGER');
-        $this->sharedPort = $f3->get('SHARED_PORT');
-        $this->exclusivePort = $f3->get('EXCLUSIVE_PORT');
-        $this->exclusiveRate = $f3->get('EXCLUSIVE_RATE');
         $this->data = yaml_parse_file(SS_CONFIG);
     }
 
@@ -83,17 +77,17 @@ class Outline extends Base
 
     private function createUser(&$nextId, &$nextPort, $rate)
     {
+        $f3 = \Base::instance();
         $id = $nextId;
         $nextId ++;
-        if (getenv('EXCLUSIVE') || in_array($rate, $this->exclusiveRate)) {
-            $port = $nextPort;
-            if ($nextPort < $this->exclusivePort[1]) {
-                $nextPort ++;
-            } else {
-                $nextPort = $this->exclusivePort[0];
+        $port = $nextPort;
+        if (getenv('EXCLUSIVE') || $rate == 0) {
+            $nextPort ++;
+            $start = $f3->get('PORT_LIMIT_' . $rate) ?: $f3->get('PORT_DEFAULT');
+            $limit = $start + $f3->get('PORT_RANGE');
+            if ($nextPort >= $limit) {
+                $nextPort = $start;
             }
-        } else {
-            $port = $this->sharedPort;
         }
         $random = substr(Uuid::uuid1()->toString(), 0, 8);
         return [
@@ -116,10 +110,22 @@ class Outline extends Base
         return (intval($maxId) + 1);
     }
 
-    private function getNextPort()
+    private function getNextPort($rate)
     {
-        $ports = array_column($this->data['keys'], 'port');
-        rsort($ports);
-        return ($ports[0] < $this->exclusivePort[1]) ? ($ports[0] + 1) : $this->exclusivePort[0];
+        $f3 = \Base::instance();
+        $start = $f3->get('PORT_LIMIT_' . $rate) ?: $f3->get('PORT_DEFAULT');
+        $limit = $start + $f3->get('PORT_RANGE');
+        $port = 0;
+        foreach ($this->data['keys'] as $key) {
+            if ($key['port'] > $start && $key['port'] < $limit) {
+                $port = $key['port'];
+            }
+        }
+        if ($port == 0) {
+            return $start;
+        } else {
+            $port ++;
+            return $port < $limit ? $port : $start;
+        }
     }
 }

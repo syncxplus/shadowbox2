@@ -56,7 +56,7 @@ if (!is_file(SS_CONFIG)) {
         $f3->config(CONFIG_DIR . 'system.ini');
         $keys['keys'][] = [
             'id' => '0',
-            'port' => $f3->get('SHARED_PORT'),
+            'port' => $f3->get('PORT_DEFAULT'),
             'cipher' => 'chacha20-ietf-poly1305',
             'secret' => 'shadowbox',
             'method' => 'chacha20-ietf-poly1305',

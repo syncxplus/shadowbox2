@@ -6,6 +6,7 @@ call_user_func(function (Base $f3) {
     $f3->config([
         CONFIG_DIR . 'system.ini',
         CONFIG_DIR . 'route.ini',
+        SS_DIR . 'config.ini',
     ]);
 
     $f3->mset([

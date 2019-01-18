@@ -1,4 +1,4 @@
-FROM syncxplus/php:7.3.0-apache-stretch
+FROM syncxplus/php:7.3.1-apache-stretch
 
 COPY cfg /var/www/cfg/
 
