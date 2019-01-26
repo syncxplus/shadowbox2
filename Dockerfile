@@ -24,9 +24,11 @@ RUN composer config --global --auth github-oauth.github.com ${GITHUB_TOKEN} \
  && composer install -d /var/www --prefer-dist --optimize-autoloader \
  && composer clear-cache
 
-RUN mkdir /var/www/shadowsocks && cd /var/www/shadowsocks \
- && SS_VER=$(curl -s https://api.github.com/repos/Jigsaw-Code/outline-ss-server/releases/latest | grep tag_name | awk '{print $2}' | sed 's/[",]//g') \
- && curl -sL https://github.com/Jigsaw-Code/outline-ss-server/releases/download/${SS_VER}/outline-ss-server_${SS_VER##*v}_linux_x86_64.tar.gz | tar xzv
+ARG SS_VER=v1.0.3-syncxplus-1
+
+RUN mkdir /var/www/shadowsocks \
+ && cd /var/www/shadowsocks \
+ && curl -sL https://github.com/syncxplus/outline-ss-server/releases/download/${SS_VER}/outline-ss-server_${SS_VER##*v}_linux_`uname -m`.tar.gz | tar xzv
 
 USER root
 
