@@ -3,9 +3,7 @@
 VIP=$(echo $1 | tr [A-Z] [a-z])
 echo "identify ${VIP:-free} server"
 
-SS_VERSION=$(curl -sL https://raw.githubusercontent.com/syncxplus/shadowbox2/master/cfg/system.ini | grep SS_VERSION)
-
-VERSION=${SS_VERSION##*=}
+VERSION=$(curl -sL https://raw.githubusercontent.com/syncxplus/shadowbox2/master/html/version)
 
 docker ps -a | grep -e shadowbox -e inline | awk '{print $1}' | xargs docker rm -f -v
 
